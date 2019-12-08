@@ -16,7 +16,7 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(con => {});
+  .then(() => {});
 
 const app = require('./app');
 
