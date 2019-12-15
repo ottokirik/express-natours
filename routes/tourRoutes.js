@@ -4,10 +4,13 @@ const {
   getTour,
   createTour,
   updateTour,
-  deleteTour
+  deleteTour,
+  getTourStats
 } = require('../controllers/tourController');
 
 const router = express.Router();
+
+router.route('/tour-stats').get(getTourStats);
 
 router
   .route('/')
