@@ -35,6 +35,10 @@ const handleErrors = {
     const message = `Invalid input data. ${errors.join('. ')}`;
     return new AppError(message, 400);
   },
+  JsonWebTokenError: () =>
+    new AppError('Invalid token. Please log in again.', 401),
+  TokenExpiredError: () =>
+    new AppError('Your token has expired. Please log in again.', 401),
   default: err => err
 };
 
