@@ -1,6 +1,5 @@
 .vscode
 node_modules
-dev-data
 public
 
 config.env
