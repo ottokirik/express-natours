@@ -11,14 +11,15 @@ const signToken = id =>
 
 exports.signup = catchAsync(async (req, res, next) => {
   const {
-    body: { name, email, password, passwordConfirm }
+    body: { name, email, password, passwordConfirm, role }
   } = req;
 
   const user = await User.create({
     name,
     email,
     password,
-    passwordConfirm
+    passwordConfirm,
+    role
   });
 
   const token = signToken(user._id);
@@ -93,3 +94,19 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+exports.restrictTo = (...roles) => (req, res, next) => {
+  //example: roles = ['admin', 'lead-guide']
+  //т.к. перед этой миддлварой запускалась миддлвара protect, то в req теперь есть user
+  const {
+    user: { role }
+  } = req;
+
+  if (!roles.includes(role)) {
+    return next(
+      new AppError('You do not have permission to perform this action', 403)
+    );
+  }
+
+  next();
+};
