@@ -11,6 +11,18 @@ const signToken = id =>
     expiresIn: process.env.JWT_EXPIRES_IN //Время жизни токена
   });
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const {
     body: { name, email, password, passwordConfirm, role }
@@ -24,15 +36,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role
   });
 
-  const token = signToken(user._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user
-    }
-  });
+  createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -52,12 +56,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 //Проверяет в ситсеме пользователь или нет
@@ -191,10 +190,24 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // Обновить поле passwordChangedAt для проверки корректности JWT. Реализовано в middleware в модели
   // Отправить корректный JWT пользователю
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const {
+    user: { id },
+    body: { passwordConfirm, password, passwordCurrent }
+  } = req;
+
+  const user = await User.findById(id).select('+password');
+
+  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  createSendToken(user, 200, res);
 });
