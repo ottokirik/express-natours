@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
@@ -50,6 +51,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
+
   const token = signToken(user._id);
 
   res.status(200).json({
@@ -116,7 +118,9 @@ exports.restrictTo = (...roles) => (req, res, next) => {
 
 //Сброс пароля
 exports.forgotPassword = async (req, res, next) => {
-  const { email } = req.body;
+  const {
+    body: { email }
+  } = req;
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -124,6 +128,7 @@ exports.forgotPassword = async (req, res, next) => {
   }
 
   const resetToken = user.createPasswordResetToken();
+
   user.save({ validateBeforeSave: false }); //Отключить валидацию, т.к. пользователь не вводит пароль
 
   const { protocol } = req;
@@ -156,4 +161,40 @@ exports.forgotPassword = async (req, res, next) => {
   }
 };
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // Найти пользователя по отправленному ему на почту токену
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  // Если пользователь найден и токен не просрочен, то установить новый пароль для пользователя
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+
+  const {
+    body: { password, passwordConfirm }
+  } = req;
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  // Обновить поле passwordChangedAt для проверки корректности JWT. Реализовано в middleware в модели
+  // Отправить корректный JWT пользователю
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token
+  });
+});

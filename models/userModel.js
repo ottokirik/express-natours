@@ -54,6 +54,14 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+  this.passwordChangedAt = Date.now() - 5000; // Установить время обновления пароля на пять секунд позже, чтобы избежать ситуации, когда JWT будет создан раньше из-за задержки доступа к БД
+  next();
+});
+
 //Методы коллекции
 userSchema.methods.correctPassword = async function(
   candidatePassword,
