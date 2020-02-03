@@ -40,7 +40,12 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 //MIDDLEWARE
@@ -59,6 +64,11 @@ userSchema.pre('save', function(next) {
     return next();
   }
   this.passwordChangedAt = Date.now() - 5000; // Установить время обновления пароля на пять секунд позже, чтобы избежать ситуации, когда JWT будет создан раньше из-за задержки доступа к БД
+  next();
+});
+
+userSchema.pre(/^find/, function(next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
