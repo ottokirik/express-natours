@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan'); //Логирование запроса
 const rateLimit = require('express-rate-limit'); //Лимитирование количества запросов с одного IP
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -10,6 +11,9 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 //MIDDLEWARES
+
+// Установка security HTTP headers
+app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -23,8 +27,12 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
-app.use(express.json()); // Добавляет объект к req, доступен в req.body
-app.use(express.static(`${__dirname}/public`)); //Статические файлы для которых нужен доступ
+
+// Добавляет объект с данными к req, доступен в req.body
+app.use(express.json({ limit: '10kb' })); //Ограничение размера данных отправляемых на сервер
+
+//Статические файлы для которых нужен доступ
+app.use(express.static(`${__dirname}/public`));
 
 //ROUTES
 
