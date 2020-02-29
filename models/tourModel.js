@@ -98,7 +98,9 @@ const tourSchema = new mongoose.Schema(
         description: String,
         day: Number
       }
-    ]
+    ],
+    //Ссылка на User, можно получить в запросе с помощью метода populate
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }]
   },
   {
     toJSON: {
@@ -131,6 +133,14 @@ tourSchema.pre('save', function(next) {
 //Регулярное выражение, которое позволяет сработать миддлваре на все методы find...
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangeAt' //Не выбирать в запросе эти поля
+  });
   next();
 });
 

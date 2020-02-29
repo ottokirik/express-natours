@@ -23,7 +23,9 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
+  const {
+    params: { id }
+  } = req;
   const tour = await Tour.findById(id);
 
   if (!tour) {
@@ -82,7 +84,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   });
 });
 
-// Использование pipelines MongoDB
+// Использование pipelines MongoDB, aggregation
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
