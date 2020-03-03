@@ -7,7 +7,9 @@ const {
 
 const { protect, restrictTo } = require('../controllers/authController');
 
-const router = express.Router();
+// mergeParams нужен для доступа к параметрам при вложенных маршрутах
+// GET /tours/:tourId/reviews - без этого флага не будет доступа к :tourId
+const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
