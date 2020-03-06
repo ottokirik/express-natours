@@ -6,7 +6,8 @@ const {
   updateUser,
   deleteUser,
   updateMe,
-  deleteMe
+  deleteMe,
+  getMe
 } = require('../controllers/userController');
 const {
   signup,
@@ -14,7 +15,8 @@ const {
   forgotPassword,
   resetPassword,
   updatePassword,
-  protect
+  protect,
+  restrictTo
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -23,10 +25,15 @@ router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.patch('/reset-password/:token', resetPassword);
-router.patch('/update-password', protect, updatePassword);
 
-router.patch('/update-me', protect, updateMe);
-router.delete('/delete-me', protect, deleteMe);
+router.use(protect); //Все, что ниже этой миддлвары будет требовать авторизации
+
+router.patch('/update-password', updatePassword);
+router.get('/me', getMe, getUser);
+router.patch('/update-me', updateMe);
+router.delete('/delete-me', deleteMe);
+
+router.use(restrictTo('admin'));
 
 router
   .route('/')

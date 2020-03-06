@@ -1,88 +1,20 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
-const AppError = require('./../utils/appError');
+//const APIFeatures = require('./../utils/apiFeatures');
+//const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+const {
+  createOne,
+  readOne,
+  updateOne,
+  deleteOne,
+  readAll
+} = require('./handlerFactory');
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //EXECUTE QUERY выполняется, только с await
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const tours = await features.query;
-
-  res.status(201).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const {
-    params: { id }
-  } = req;
-  const tour = await Tour.findById(id).populate('reviews');
-
-  if (!tour) {
-    return next(new AppError(`No tour found with that ID: ${id}`, 404));
-  }
-
-  res.status(201).json({
-    status: 'saccess',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.createTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const tour = await Tour.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true
-  });
-
-  if (!tour) {
-    return next(new AppError(`No tour found with that ID: ${id}`, 404));
-  }
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour
-    }
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const tour = await Tour.findByIdAndDelete(id);
-
-  if (!tour) {
-    return next(new AppError(`No tour found with that ID: ${id}`, 404));
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null
-  });
-});
+exports.getAllTours = readAll(Tour);
+exports.createTour = createOne(Tour);
+exports.getTour = readOne(Tour, { path: 'reviews' });
+exports.updateTour = updateOne(Tour);
+exports.deleteTour = deleteOne(Tour);
 
 // Использование pipelines MongoDB, aggregation
 exports.getTourStats = catchAsync(async (req, res, next) => {

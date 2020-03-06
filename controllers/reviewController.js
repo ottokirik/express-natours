@@ -1,7 +1,26 @@
 const Review = require('../models/reviewModel');
-const catchAsync = require('../utils/catchAsync');
+//const catchAsync = require('../utils/catchAsync');
+const {
+  readOne,
+  createOne,
+  updateOne,
+  deleteOne,
+  readAll
+} = require('./handlerFactory');
 
-exports.getAllReviews = catchAsync(async (req, res, next) => {
+exports.setTourId = (req, res, next) => {
+  req.filter = {};
+  if (req.params.tourId) {
+    req.filter = {
+      tour: req.params.tourId
+    };
+  }
+  next();
+};
+
+exports.getAllReviews = readAll(Review);
+
+/* exports.getAllReviews = catchAsync(async (req, res, next) => {
   let filter;
 
   if (req.params.tourId) {
@@ -19,27 +38,17 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
       reviews
     }
   });
-});
+}); */
 
-exports.createReview = catchAsync(async (req, res, next) => {
+//Миддлвара, вызывается перед createReview, т.к. необходимы tourId и userId
+exports.setTourUserIds = (req, res, next) => {
   // Условия позволяют задавать пользователя и тур вручную
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
+  next();
+};
 
-  const {
-    body: { review, rating, tour, user }
-  } = req;
-
-  const newReview = await Review.create({
-    review,
-    rating,
-    tour,
-    user
-  });
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review: newReview
-    }
-  });
-});
+exports.createReview = createOne(Review);
+exports.getReview = readOne(Review);
+exports.updateReview = updateOne(Review);
+exports.deleteReview = deleteOne(Review);

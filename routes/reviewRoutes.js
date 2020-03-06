@@ -2,7 +2,12 @@ const express = require('express');
 
 const {
   getAllReviews,
-  createReview
+  getReview,
+  createReview,
+  deleteReview,
+  updateReview,
+  setTourUserIds,
+  setTourId
 } = require('../controllers/reviewController');
 
 const { protect, restrictTo } = require('../controllers/authController');
@@ -11,9 +16,17 @@ const { protect, restrictTo } = require('../controllers/authController');
 // GET /tours/:tourId/reviews - без этого флага не будет доступа к :tourId
 const router = express.Router({ mergeParams: true });
 
+router.use(protect);
+
 router
   .route('/')
-  .get(getAllReviews)
-  .post(protect, restrictTo('user'), createReview);
+  .get(setTourId, getAllReviews)
+  .post(restrictTo('user'), setTourUserIds, createReview);
+
+router
+  .route('/:id')
+  .get(getReview)
+  .patch(restrictTo('user', 'admin'), updateReview)
+  .delete(restrictTo('user', 'admin'), deleteReview);
 
 module.exports = router;
