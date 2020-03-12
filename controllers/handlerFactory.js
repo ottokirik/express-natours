@@ -49,6 +49,7 @@ exports.readAll = Model =>
       .limitFields()
       .paginate();
 
+    //const docs = awat features.query.explain(); Статистика по запросу
     const docs = await features.query;
 
     res.status(201).json({

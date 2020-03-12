@@ -20,26 +20,6 @@ exports.setTourId = (req, res, next) => {
 
 exports.getAllReviews = readAll(Review);
 
-/* exports.getAllReviews = catchAsync(async (req, res, next) => {
-  let filter;
-
-  if (req.params.tourId) {
-    filter = {
-      tour: req.params.tourId
-    };
-  }
-
-  const reviews = await Review.find(filter);
-
-  res.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews
-    }
-  });
-}); */
-
 //Миддлвара, вызывается перед createReview, т.к. необходимы tourId и userId
 exports.setTourUserIds = (req, res, next) => {
   // Условия позволяют задавать пользователя и тур вручную

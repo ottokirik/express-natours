@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -33,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 //QUERY MIDDLWARE
 reviewSchema.pre(/^find/, function(next) {
   this.populate({
@@ -40,6 +43,52 @@ reviewSchema.pre(/^find/, function(next) {
     select: 'name photo'
   });
   next();
+});
+
+reviewSchema.statics.calcAverageRatings = async function(tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId }
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' }
+      }
+    }
+  ]);
+
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
+};
+
+reviewSchema.post('save', function() {
+  //post миддлваре не передается метод next
+  // this = текущий отзыв
+  // Review еще не определен, поэтому используем this.constructor === Review
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+//findByIdAndUpdate или findIdAndDelete сокаращение для findOneAnd...
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  //this === query
+  this.r = await this.findOne(); //Отдаст первый документ, из запроса.
+
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
