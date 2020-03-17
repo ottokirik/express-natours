@@ -115,6 +115,7 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.index({ price: 1 }); //Добавление индекас в документ, сортировка по возрастанию
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 //Виртуальные свойства, которые не записываются в базу, а вычисляются на лету
 tourSchema.virtual('durationWeeks').get(function() {
@@ -151,10 +152,10 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 //AGGREGATION MIDDLEWARE, this = aggregation object
-tourSchema.pre('aggregate', function(next) {
+/* tourSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
-});
+}); */
 
 const Tour = mongoose.model('Tour', tourSchema);
 
