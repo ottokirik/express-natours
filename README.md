@@ -9,3 +9,4 @@
 - Node.js и Express
 - MongoDB и Mongoose
 - Библиотеки: bcryptsjs, jsonwebtoken, nodemailer
+- Mapbox
