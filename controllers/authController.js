@@ -82,14 +82,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   } = req;
 
   //Проверка, автризован ли пользователь
-  if (!authorization || !authorization.startsWith('Bearer')) {
+  if (
+    (!authorization || !authorization.startsWith('Bearer')) &&
+    !req.cookies.jwt
+  ) {
     return next(
       new AppError('You are not logged in! Please log in to get access.', 401)
     );
   }
 
   //Получение токена
-  const token = authorization.split(' ')[1];
+  const token = authorization ? authorization.split(' ')[1] : req.cookies.jwt;
 
   //Получение id пользователя из токена
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);

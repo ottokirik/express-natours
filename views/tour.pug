@@ -5,7 +5,6 @@ include _reviewCard
 block append head
     script(src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js')
     link(href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css', rel='stylesheet')
-    script(src='/js/mapbox.js')
 
 mixin overviewBox(label, text, icon)
     .overview-box__detail
@@ -91,3 +90,5 @@ block content
                     button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
                 else
                     a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
+
+    script(src="/js/mapbox.js")

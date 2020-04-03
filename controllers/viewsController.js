@@ -1,5 +1,4 @@
 const Tour = require('../models/tourModel');
-
 const catchAsync = require('../utils/catchAsync');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
@@ -11,7 +10,7 @@ exports.getOverview = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getTour = catchAsync(async (req, res) => {
+exports.getTour = catchAsync(async (req, res, next) => {
   const {
     params: { slug }
   } = req;
@@ -25,3 +24,9 @@ exports.getTour = catchAsync(async (req, res) => {
     tour
   });
 });
+
+exports.getLoginForm = (req, res) => {
+  res.status(200).render('login', {
+    title: 'Log into your accaunt'
+  });
+};
