@@ -1,22 +1,21 @@
-/* eslint-disable no-undef */
-const login = async (email, password) => {
+/* eslint-disable */
+import axios from 'axios';
+
+import { showAlert, SUCCESS, ERROR } from './alerts';
+
+export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
       url: 'http://localhost:3000/api/v1/users/login',
       data: { email, password }
     });
-    console.log(res);
+
+    if (res.data.status === SUCCESS) {
+      showAlert(SUCCESS, 'Logged in successfully');
+      window.location.assign('/');
+    }
   } catch (error) {
-    console.log(error);
+    showAlert(ERROR, error.response.data.message);
   }
 };
-
-document.querySelector('.form').addEventListener('submit', event => {
-  event.preventDefault();
-
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  login(email, password);
-});

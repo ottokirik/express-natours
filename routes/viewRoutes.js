@@ -8,7 +8,9 @@ const {
   getLoginForm
 } = require('../controllers/viewsController');
 
-//const { protect } = require('../controllers/authController');
+const { isLoggedIn } = require('../controllers/authController');
+
+router.use(isLoggedIn);
 
 router.get('/', getOverview);
 router.get('/tour/:slug', getTour);

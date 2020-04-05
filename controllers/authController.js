@@ -116,6 +116,33 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+    const { id, iat } = decoded;
+
+    //Проверка, существует ли пользователь. Если пользователь удалил учетную запись, а токен еще действует.
+    const user = await User.findById(id);
+
+    if (!user) {
+      return next();
+    }
+    //Проверка, не менял ли пользователь пароль после полученя токена
+    if (user.changedPasswordAfter(iat)) {
+      return next();
+    }
+
+    //user будет доступен в шаблонах pug, например в нашем случае в шаблоне _header.pug
+    res.locals.user = user;
+    return next();
+  }
+
+  next();
+});
+
 //Проверяет, разрешен ли доступ к маршруту на основе переданных ролей
 exports.restrictTo = (...roles) => (req, res, next) => {
   //example: roles = ['admin', 'lead-guide']
