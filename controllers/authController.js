@@ -122,6 +122,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //У пользователя есть права на доступ к ресурсу
   req.user = user;
+  res.locals.user = user;
   next();
 });
 
