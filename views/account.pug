@@ -29,12 +29,7 @@ block content
             .user-view__content
                 .user-view__form-container
                     h2.heading-secondary.ma-bt-md Your account settings
-
-                    //- WITHOUT API
-                    //- form.form.form-user-data(action='/submit-user-data' method='POST' enctype='multipart/form-data')
-
-                    //- WITH API
-                    form.form.form-user-data
+                    form.form.form-user-data#update-user-form
                         .form__group
                             label.form__label(for='name') Name
                             input#name.form__input(type='text', value=`${user.name}`, required, name='name')
@@ -47,13 +42,13 @@ block content
                             label(for='photo') Choose new photo
 
                         .form__group.right
-                            button.btn.btn--small.btn--green Save settings
+                            button.btn.btn--small.btn--green#btn--save-data Save settings
 
                 .line &nbsp;
 
                 .user-view__form-container
                     h2.heading-secondary.ma-bt-md Password change
-                    form.form.form-user-password
+                    form.form.form-user-password#update-password-form
                         .form__group
                             label.form__label(for='password-current') Current password
                             input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8')
@@ -64,4 +59,4 @@ block content
                             label.form__label(for='password-confirm') Confirm password
                             input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
                         .form__group.right
-                            button.btn.btn--small.btn--green.btn--save-password Save password
+                            button.btn.btn--small.btn--green#btn--save-password Save password

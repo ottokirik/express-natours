@@ -43,8 +43,11 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
-// Добавляет объект с данными к req, доступен в req.body
+//Добавляет объект с данными к req, доступен в req.body
 app.use(express.json({ limit: '10kb' })); //Ограничение размера данных отправляемых на сервер
+
+/* //Парсит данные форм, отправляемых на сервер
+app.use(express.urlencoded({ limit: '10kb' })); */
 
 //Парсинг значений из cookie, доступны в req.cookies
 app.use(cookieParser());
