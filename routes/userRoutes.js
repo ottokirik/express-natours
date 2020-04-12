@@ -7,7 +7,9 @@ const {
   deleteUser,
   updateMe,
   deleteMe,
-  getMe
+  getMe,
+  uploadUserPhoto,
+  resizeUserPhoto
 } = require('../controllers/userController');
 const {
   signup,
@@ -32,7 +34,7 @@ router.use(protect); //Все, что ниже этой миддлвары бу�
 
 router.patch('/update-password', updatePassword);
 router.get('/me', getMe, getUser);
-router.patch('/update-me', updateMe);
+router.patch('/update-me', uploadUserPhoto, resizeUserPhoto, updateMe);
 router.delete('/delete-me', deleteMe);
 
 router.use(restrictTo('admin'));

@@ -8,6 +8,6 @@
 
 - Node.js и Express
 - MongoDB и Mongoose
-- Библиотеки: bcryptsjs, jsonwebtoken, nodemailer
+- Библиотеки: bcryptsjs, jsonwebtoken, nodemailer, multer, sharp
 - Mapbox
 - Parcel

@@ -8884,7 +8884,7 @@ if (logoutBtn) {
 if (updateUserForm) {
   updateUserForm.addEventListener('submit', /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(event) {
-      var btn, name, email;
+      var btn, form;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -8892,18 +8892,18 @@ if (updateUserForm) {
               btn = document.querySelector('#btn--save-data');
               btn.textContent = 'Updating...';
               event.preventDefault();
-              name = document.querySelector('#name').value;
-              email = document.querySelector('#email').value;
-              _context.next = 7;
-              return (0, _updateSettings.updateSettings)({
-                name: name,
-                email: email
-              }, _updateSettings.UPDATE_DATA);
+              form = new FormData();
+              form.append('name', document.querySelector('#name').value);
+              form.append('email', document.querySelector('#email').value);
+              form.append('photo', document.querySelector('#photo').files[0]);
+              _context.next = 9;
+              return (0, _updateSettings.updateSettings)(form, _updateSettings.UPDATE_DATA);
 
-            case 7:
+            case 9:
+              window.location.reload(true);
               btn.textContent = 'Save settings';
 
-            case 8:
+            case 11:
             case "end":
               return _context.stop();
           }
@@ -8983,7 +8983,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46419" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46567" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

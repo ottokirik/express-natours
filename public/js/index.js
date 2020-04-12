@@ -38,9 +38,16 @@ if (updateUserForm) {
     btn.textContent = 'Updating...';
 
     event.preventDefault();
-    const name = document.querySelector('#name').value;
-    const email = document.querySelector('#email').value;
-    await updateSettings({ name, email }, UPDATE_DATA);
+
+    const form = new FormData();
+    form.append('name', document.querySelector('#name').value);
+    form.append('email', document.querySelector('#email').value);
+    form.append('photo', document.querySelector('#photo').files[0]);
+
+    await updateSettings(form, UPDATE_DATA);
+
+    window.location.reload(true);
+
     btn.textContent = 'Save settings';
   });
 }
