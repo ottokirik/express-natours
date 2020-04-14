@@ -40,7 +40,7 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('photo');
 
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   const { file } = req;
   if (!file) return next();
 
@@ -52,14 +52,14 @@ exports.resizeUserPhoto = (req, res, next) => {
   req.file.filename = `user-${id}-${Date.now()}.jpg`;
 
   //Multer сохраняет фото в память, доступ через буфер
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
 
   next();
-};
+});
 
 const filterObj = (obj, ...allowedFields) => {
   return Object.keys(obj).reduce((acc, key) => {

@@ -1,3 +1,6 @@
+const multer = require('multer');
+const sharp = require('sharp');
+
 const Tour = require('./../models/tourModel');
 //const APIFeatures = require('./../utils/apiFeatures');
 const AppError = require('./../utils/appError');
@@ -15,6 +18,73 @@ exports.createTour = createOne(Tour);
 exports.getTour = readOne(Tour, { path: 'reviews' });
 exports.updateTour = updateOne(Tour);
 exports.deleteTour = deleteOne(Tour);
+
+//Загрузка фотографий
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    return cb(
+      new AppError('Not an image. Please upload only images.', 400),
+      false
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+//Фото будут в req.files
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 }
+]);
+
+//Если надо загрузить несколько фотографий, без поля с одной фотографией, то можно:
+//upload.array('images', 5);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  const {
+    files: { imageCover, images }
+  } = req;
+
+  if (!imageCover || !images) {
+    return next();
+  }
+
+  const imageCoverFilename = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  await sharp(imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${imageCoverFilename}`);
+
+  //Для доступа при сохранении в БД в миддлваре updateOne
+  req.body.imageCover = imageCoverFilename;
+
+  req.body.images = [];
+  //Функция асинк возвращает промисы, map создаст новый массив промисов, дождемся всех выполнения всех промисов с помощью Promise.all
+  await Promise.all(
+    images.map(async (file, idx) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${idx + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+
+  next();
+});
 
 // Использование pipelines MongoDB, aggregation
 exports.getTourStats = catchAsync(async (req, res, next) => {
