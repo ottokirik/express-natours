@@ -17,3 +17,4 @@
   - html-to-text
 - Mapbox
 - Parcel
+- Stripe
