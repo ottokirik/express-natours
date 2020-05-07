@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
+
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
@@ -11,21 +12,20 @@ const signToken = id =>
     expiresIn: process.env.JWT_EXPIRES_IN //Время жизни токена
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, res, req) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
+  /* if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  } */
+
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    cookieOptions.secure = true;
-  }
-
-  res.cookie('jwt', token, cookieOptions);
+    httpOnly: true,
+    secure: req.secure || req.headers(['x-forwarded-proto']) === 'https'
+  });
 
   user.password = undefined; //Не отправляем пароль пользователю при создании
 
@@ -56,7 +56,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     `${req.protocol}://${req.get('host')}/me`
   ).sendWelcome();
 
-  createSendToken(user, 201, res);
+  createSendToken(user, 201, res, req);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -76,7 +76,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, req);
 });
 
 exports.logout = (req, res) => {
@@ -249,7 +249,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // Обновить поле passwordChangedAt для проверки корректности JWT. Реализовано в middleware в модели
   // Отправить корректный JWT пользователю
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, req);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -268,5 +268,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = passwordConfirm;
   await user.save();
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res, req);
 });

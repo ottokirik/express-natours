@@ -19,6 +19,9 @@ const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
+//Доверять прокси, для работы heroku
+app.enable('trust proxy');
+
 //Настройка шаблонизатора, будем использовать pug
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));

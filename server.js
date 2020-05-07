@@ -40,3 +40,11 @@ process.on('unhandledRejection', err => {
     process.exit(1);
   });
 });
+
+//Корректное завершение приложения при перезапуске на сервере heroku
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  server.close(() => {
+    console.log('💥 Process terminated!');
+  });
+});
