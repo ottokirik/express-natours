@@ -1,5 +1,5 @@
-.vscode
-node_modules
-.cache
+.vscode/
+node_modules/
+.cache/
 
-config.env
+*.env
