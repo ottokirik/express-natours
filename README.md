@@ -6,12 +6,11 @@
 
 Дизайн сайта разработан автором курса, не оптимизирован для мобильных устройств.
 
-![Илюстрация к проекту](https://raw.githubusercontent.com/ottokirik/express-natours/master/natours.png)
-
-["Живой" сайт][2]
+[!["Живой" сайт][3]][2]
 
 [1]: https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/ 'Курс на Udemy'
 [2]: https://arcane-stream-89122.herokuapp.com/ 'Сайт на heroku'
+[3]: https://raw.githubusercontent.com/ottokirik/express-natours/master/natours.png 'Сайт'
 
 ## Техниологии использованные в проекте
 
