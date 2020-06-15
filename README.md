@@ -6,7 +6,7 @@
 
 Дизайн сайта разработан автором курса, не оптимизирован для мобильных устройств.
 
-![Илюстрация к проекту](https://github.com/ottokirik/express-natours/natours.png)
+![Илюстрация к проекту](https://raw.githubusercontent.com/ottokirik/express-natours/master/natours.png)
 
 ["Живой" сайт][2]
 
